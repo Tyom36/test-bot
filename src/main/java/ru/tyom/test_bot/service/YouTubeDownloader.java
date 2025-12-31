@@ -46,6 +46,9 @@ public class YouTubeDownloader {
 	@Value("${youtube.download.extractor-retries:2}")
 	private int extractorRetries;
 
+	@Value("${youtube.cookies-path}")
+	private String cookiesPath;
+
 	public File downloadVideo(String url) throws IOException, InterruptedException, TimeoutException {
 		Path tempPath = Paths.get(tempDir);
 		if (!Files.exists(tempPath)) {
@@ -64,6 +67,8 @@ public class YouTubeDownloader {
 			command.add("/c");
 		}
 		command.add(downloaderCommand);
+		command.add("--cookies");
+		command.add(cookiesPath);
 		command.add("-f");
 		command.add("bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best");
 		command.add("--merge-output-format");
