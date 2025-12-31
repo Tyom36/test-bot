@@ -12,6 +12,8 @@ import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicReference;
@@ -55,18 +57,30 @@ public class YouTubeDownloader {
 		log.info("Downloading video from YouTube: {}", url);
 
 		ProcessBuilder processBuilder = new ProcessBuilder();
+
+		List<String> command = new ArrayList<>();
 		if (SystemUtils.IS_OS_WINDOWS) {
-			processBuilder.command("cmd", "/c", downloaderCommand,
-				"-f", "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best",
-				"--merge-output-format", "mp4",
-				"-o", outputTemplate,
-				"--no-playlist",
-				"--retries", String.valueOf(retries),
-				"--socket-timeout", String.valueOf(socketTimeout),
-				"--extractor-retries", String.valueOf(extractorRetries),
-				"--no-check-certificates",
-				url);
+			command.add("cmd");
+			command.add("/c");
 		}
+		command.add(downloaderCommand);
+		command.add("-f");
+		command.add("bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best");
+		command.add("--merge-output-format");
+		command.add("mp4");
+		command.add("-o");
+		command.add(outputTemplate);
+		command.add("--no-playlist");
+		command.add("--retries");
+		command.add(String.valueOf(retries));
+		command.add("--socket-timeout");
+		command.add(String.valueOf(socketTimeout));
+		command.add("--extractor-retries");
+		command.add(String.valueOf(extractorRetries));
+		command.add("--no-check-certificates");
+		command.add(url);
+
+		processBuilder.command(command);
 
 		processBuilder.redirectErrorStream(true);
 		Process process = processBuilder.start();

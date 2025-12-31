@@ -12,6 +12,8 @@ import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicReference;
@@ -38,29 +40,31 @@ public class VideoCompressor {
 		Path outputPath = Paths.get(tempDir, "compressed_" + inputFile.getName());
 
 		ProcessBuilder processBuilder = new ProcessBuilder();
+
+		List<String> command = new ArrayList<>();
 		if (SystemUtils.IS_OS_WINDOWS) {
-			processBuilder.command("cmd", "/c", "ffmpeg",
-				"-i", inputFile.getAbsolutePath(),
-				"-c:v", "libx264",
-				"-crf", String.valueOf(crf),
-				"-preset", preset,
-				"-c:a", "aac",
-				"-b:a", "128k",
-				"-movflags", "+faststart",
-				"-y",
-				outputPath.toString());
-		} else {
-			processBuilder.command("ffmpeg",
-				"-i", inputFile.getAbsolutePath(),
-				"-c:v", "libx264",
-				"-crf", String.valueOf(crf),
-				"-preset", preset,
-				"-c:a", "aac",
-				"-b:a", "128k",
-				"-movflags", "+faststart",
-				"-y",
-				outputPath.toString());
+			command.add("cmd");
+			command.add("/c");
 		}
+		command.add("ffmpeg");
+		command.add("-i");
+		command.add(inputFile.getAbsolutePath());
+		command.add("-c:v");
+		command.add("libx264");
+		command.add("-crf");
+		command.add(String.valueOf(crf));
+		command.add("-preset");
+		command.add(preset);
+		command.add("-c:a");
+		command.add("aac");
+		command.add("-b:a");
+		command.add("128k");
+		command.add("-movflags");
+		command.add("+faststart");
+		command.add("-y");
+		command.add(outputPath.toString());
+
+		processBuilder.command(command);
 
 		processBuilder.redirectErrorStream(true);
 		Process process = processBuilder.start();
